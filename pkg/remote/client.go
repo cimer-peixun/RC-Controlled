@@ -52,6 +52,16 @@ func SendMsg(msg string) bool {
 	return true
 }
 
+func SendFile(fname string) {
+	buffer, err := ioutil.ReadFile(fname)
+	fmt.Printf("buffer size = %d\n", len(buffer))
+	if err != nil {
+		fmt.Println("发送文件-读文件-错误")
+	}
+	GConn.Write(buffer)
+	GConn.Write(nil)
+}
+
 // receive data from server
 func postFile(url, fname string) error {
 	//这是一个Post 参数会被返回的地址

@@ -5,9 +5,19 @@ import (
 	"image"
 	"image/png"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/kbinani/screenshot"
 )
+
+func GetFileSize(fname string) int64 {
+	fs, err := os.Stat(fname)
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+	}
+	return fs.Size()
+}
 
 func save(img *image.RGBA, filePath string) {
 	file, err := os.Create(filePath)
@@ -18,15 +28,21 @@ func save(img *image.RGBA, filePath string) {
 	png.Encode(file, img)
 }
 
-func CaptureFullScreen() {
+func CaptureFullScreen() string {
 	img, err := screenshot.CaptureDisplay(0)
 	if err != nil {
 		panic(err)
 	}
-	save(img, "自定义.png")
+
+	// get current timestamp
+	timestamp := strconv.FormatInt(time.Now().UnixNano(), 10)
+	// save png
+	filename := timestamp + ".png"
+	save(img, filename)
+	return filename
 }
 
-func main() {
+func mainx() {
 
 	//自定义截图
 	img, err := screenshot.Capture(0, 0, 500, 500)
