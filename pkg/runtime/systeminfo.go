@@ -27,9 +27,7 @@ func GetSystemInfo(osid int) (sysinfo string) {
 		if err != nil {
 			fmt.Println(err.Error())
 		} else {
-
-			bs := ConvertByte2String(outBuf.Bytes(), UTF8)
-			sysinfo = string(bs)
+			sysinfo = ConvertByte2String(outBuf.Bytes(), GB18030)
 		}
 	case 3:
 		// mac os

